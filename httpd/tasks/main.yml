@@ -1,0 +1,34 @@
+---
+# tasks file for httpd
+- name: Ensure Apache (httpd) is installed
+  ansible.builtin.yum:
+    name: httpd
+    state: present
+    update_cache: yes
+
+- name: Copy index.html file with owner and permissions
+  ansible.builtin.copy:
+    src: files/index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Start and enable Apache service
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: Enable HTTP service in the firewall
+  ansible.builtin.command:
+    cmd: firewall-cmd --add-service=http --permanent
+
+- name: Enable HTTP port in the firewall
+  ansible.builtin.command:
+    cmd: firewall-cmd --add-port=80/tcp --permanent
+
+- name: Reload the firewall
+  ansible.builtin.command:
+    cmd: firewall-cmd --reload
+
